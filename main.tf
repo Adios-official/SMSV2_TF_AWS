@@ -66,6 +66,7 @@ write_files:
 - path: /etc/vpm/user_data
   content: |
     token: ${var.token}
+    proxy : ${var.proxy}
   owner: root
   permissions: '0644'
 EOF
@@ -110,6 +111,7 @@ write_files:
 - path: /etc/vpm/user_data
   content: |
     token: ${var.token}
+    proxy : ${var.proxy}
   owner: root
   permissions: '0644'
 EOF

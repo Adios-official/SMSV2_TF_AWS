@@ -2,9 +2,10 @@ Based on the provided files, here's a README that describes your Terraform confi
 
 ---
 
-# EC2 Multi-Node Deployment using Terraform ( for SMSV2 )
+# EC2 Multi-Node Deployment using Terraform ( for SMSV2 ) - Uses only AWS provider
 
 This Terraform configuration deploys a set of three EC2 instances across different availability zones (AZs) within a Virtual Private Cloud (VPC) in AWS. Each EC2 instance is placed in its own subnet and AZ, and all instances are configured with user data scripts for provisioning upon startup.
+Note : This is for a brown field deployment scenario, where the VPC, Subnets, Route tables and Public IP assigment is already enabled at subent level or the instance is behind a NAT gateway. 
 
 ## Prerequisites
 

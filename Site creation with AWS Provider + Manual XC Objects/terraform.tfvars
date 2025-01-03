@@ -49,14 +49,14 @@ ami = "ami-0d43e733ea176527a"
 # Instance Type
 instance_type = "t3.xlarge"
 
-# Storage
+# Storage - Please keep the value as 80 as 80 GB is needed for the CE
 root_block_device = {
   volume_size = 80
 }
 
 # User Data (Cloud-init to write token to /etc/vpm/user_data)
 #GENERATE TOKEN VALUE FROM XC CONSOLE
-#USE PROXY IF NEEDED ELSE DELETE THAT LINE
+#USE PROXY IF NEEDED ELSE DELETE LINES 26, 69, 114 FROM MAIN.TF
 token = "xxxxxxxxxxxxxx"
 proxy = "http://ec2-3-70-200-33.eu-central-1.compute.amazonaws.com:3128"
 
@@ -69,5 +69,5 @@ tags = {
   "customer_tag_2" = "placeholder2"
 }
 
-# Timing delays (in seconds) for sequential instance creation
+# Timing delays (in seconds) for sequential instance creation. This is only used for Troubleshooting and usage is currently commented out in main.tf.
 delay_between_nodes = 300  # 5 minutes

@@ -49,7 +49,7 @@ ami = "ami-0d43e733ea176527a"
 # Instance Type
 instance_type = "t3.xlarge"
 
-# Storage
+# Storage - Please keep the value as 80 as 80 GB is needed for the CE
 root_block_device = {
   volume_size = 80
 }
@@ -67,7 +67,7 @@ tags = {
   "customer_tag_2" = "placeholder2"
 }
 
-# Timing delays (in seconds) for sequential instance creation
+# Timing delays (in seconds) for sequential instance creation. This is only used for Troubleshooting and usage is currently commented out in main.tf.
 delay_between_nodes = 300  # 5 minutes
 
 # These are arguments to supply your api creds for interacting with the XC Tenant

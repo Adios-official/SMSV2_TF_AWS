@@ -77,6 +77,7 @@ variable "tags" {
 # BLOCK 3 #  NETWORKING AND NETWORK INTERFACES FOR NODES
 # 3.1 SLO CONFIG 
 ##############################################################################################################################
+
 variable "slo_subnet_ids" {
   description = "List of subnet IDs (1 if num_nodes = 1, 3 if num_nodes = 3)"
   type        = list(string)
@@ -93,41 +94,10 @@ variable "sli_subnet_ids" {
 
 }
 
-
-
-#variable "security_group_ids" {
-#  description = "List of security group IDs"
-#  type        = list(string)
-#}
-
-
-
-#variable "instance_profile_name" {
-#  description = "IAM instance profile name"
-#  type        = string
-#}
-
-
-
-
-
-
-#variable "proxy" {
-#  description = "Proxy to be used in the user data script"
-#  type        = string
-#}
-
-
-
-#variable "delay_between_nodes" {
-#  description = "Delay between the creation of each node (in seconds)"
-#  type        = number
-#  default     = 0  # Optional, not used in the main code
-#}
-
 ##############################################################################################################################
 # BLOCK 4 # PUBLIC IP ASSIGNMENT VARIABLES
 ##############################################################################################################################
+
 variable "eip_config" {
   description = "Elastic IP configuration: either create new or use existing EIPs"
   type = object({

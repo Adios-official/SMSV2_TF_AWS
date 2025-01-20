@@ -93,7 +93,7 @@ Update the `terraform.tfvars` file with:
 
 ## 4. Post-Deployment
 
-- Verify the created CE instances in the GCP console.
+- Verify the created CE instances in the AWS console.
 - Validate the Volterra site object and token.
 
 ## Notes and Considerations

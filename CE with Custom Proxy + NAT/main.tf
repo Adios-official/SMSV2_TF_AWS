@@ -115,6 +115,7 @@ write_files:
 - path: /etc/vpm/user_data
   content: |
     token: ${volterra_token.smsv2-token.id}
+    proxy : ${var.proxy}
   owner: root
   permissions: '0644'
 EOF

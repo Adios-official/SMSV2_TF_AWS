@@ -36,7 +36,6 @@ root_block_device = {                        # The root block device is the prim
   "customer_tag_2"    = "placeholder2"
   }
   
-  #instance_profile_name = "f5-xc-test-role"
 
 
 
@@ -104,8 +103,6 @@ az_names = [
 ]
 
 
-# User Data (Cloud-init to write token to /etc/vpm/user_data)
-#proxy = "http://ec2-3-70-200-33.eu-central-1.compute.amazonaws.com:3128"
 
 ##############################################################################################################################
 # BLOCK 6 # SECURITY GROUP DETAILS

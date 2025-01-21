@@ -47,7 +47,7 @@ This folder contains the Terraform configuration for deploying **Customer Edge (
   - Assumes customer-side NAT configuration to route outbound traffic through an HTTP proxy.
 
 ### 2. **`ce-with-public-slo-ip/`**
-This folder contains the Terraform configuration for deploying **Customer Edge (CE)** with public IP addresses assigned to the **SLO network interfaces**. The IPs are managed either through new static IPs (Elastic IPs) or existing IPs provided.
+This folder contains the Terraform configuration for deploying **Customer Edge (CE)** with public IP addresses assigned to the **SLO network interfaces**. The IPs are managed either through new static IPs (Elastic IPs) or EIP Allocation IDs provided.
 
 - **Use case**: Choose this configuration if you need public IPs directly assigned to the SLO network interfaces for external communication.
 - **Key Features**:

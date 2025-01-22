@@ -19,6 +19,11 @@ resource "volterra_securemesh_site_v2" "smsv2-site-object" {
   aws {
     not_managed {}
     }
+  lifecycle {
+    ignore_changes = [
+    labels
+    ]
+    }
   }
 
 

@@ -94,7 +94,7 @@ Update the `terraform.tfvars` file with:
   ```bash
   terraform apply
 
-  ## 4. Post-Deployment
+## 4. Post-Deployment
 
 - Verify the created CE instances in the AWS console.
 - Validate the Volterra site object and token.

@@ -16,11 +16,10 @@ vpc_id = "vpc-xxxxxxxxxx"
 # CHANGE THESE VALUES AS PER YOUR USE-CASE
 ##############################################################################################################################
 
-# Base name for EC2 instances
 # CHANGE THIS
 cluster_name = "adios-aws5-smsv2-3no-2ni"    # Name for the customer Edge ( Each node will take this name followed by suffix like node-1, node-2 etc. )
 num_nodes           = 3                      # Choose if you need a Single Node CE or an HA CE with 3 Nodes
-num_nics            = 1                      # Use 1 for single NIC or 2 for dual NIC. If you need dual NIC, please fill section  # VPC Network for SLI
+num_nics            = 1                      # Use 1 for single NIC or 2 for dual NIC. 
 instance_type = "t3.xlarge"
 ami = "ami-0d43e733ea176527a"                # Read "Find AMI" section from https://docs.cloud.f5.com/docs-v2/multi-cloud-network-connect/how-to/site-management/deploy-sms-aws-clickops
 root_block_device = {                        # The root block device is the primary disk used to store the operating system and boot the instance.

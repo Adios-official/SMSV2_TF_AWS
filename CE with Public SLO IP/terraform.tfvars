@@ -43,7 +43,6 @@ root_block_device = {                        # The root block device is the prim
 # BLOCK 3 #  NETWORKING AND NETWORK INTERFACES FOR NODES
 # 3.1 SLO CONFIG 
 # Provide distinct SLO subnet values for each node if 3 nodes
-# Carefully choose the public_ip_assignment type
 ##############################################################################################################################
 
 

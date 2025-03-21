@@ -44,7 +44,7 @@ instance_profile_name = "xxxxxxxxxx"
 # AMI
 #Below AMI ID is for eu-central-1
 #CHANGE THIS
-ami = "ami-0d43e733ea176527a"
+ami = "ami-0641366e54b020b08"
 
 # Instance Type
 instance_type = "t3.xlarge"

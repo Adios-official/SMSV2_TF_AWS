@@ -40,18 +40,9 @@ resource "volterra_token" "smsv2-token" {
 }
 
 
-##############################################################################################################################
-# BLOCK 3 # Create Elastic IP(s) (EIP) 
-##############################################################################################################################
-resource "aws_eip" "example" {
-  count = var.eip_config.create_eip && length(var.eip_config.existing_allocation_ids) == 0 ? var.num_nodes : 0
-    tags = {
-    Name = "${var.cluster_name}-slo-nic-eip-${count.index + 1}"
-  }
-} 
   
 ##############################################################################################################################
-# BLOCK 4 # Create Network Interfaces
+# BLOCK 3 # Create Network Interfaces
 ##############################################################################################################################
 # Create SLO NICs
 resource "aws_network_interface" "slo_nics" {
@@ -78,7 +69,7 @@ resource "aws_network_interface" "sli_nics" {
 
 
 ##############################################################################################################################
-# BLOCK 5 # Create EC2 instance(s) / CE Node(s)
+# BLOCK 4 # Create EC2 instance(s) / CE Node(s)
 ##############################################################################################################################
 
 resource "aws_instance" "ec2_instance" {
@@ -141,25 +132,9 @@ EOF
   depends_on = [volterra_token.smsv2-token]
 }
 
-##############################################################################################################################
-# BLOCK 6 # Associate Elastic IP with Network Interfaces (SLO)
-##############################################################################################################################
-# Associate Elastic IPs with the SLO NICs (if created)
-resource "aws_eip_association" "associate_eip" {
-  count                = var.eip_config.create_eip && length(var.eip_config.existing_allocation_ids) == 0 ? var.num_nodes : 0
-  network_interface_id = aws_network_interface.slo_nics[count.index].id
-  allocation_id        = aws_eip.example[count.index].id
-}
-
-# Associate existing Elastic IPs (only if create_eip is false)
-resource "aws_eip_association" "associate_existing_eip" {
-  count                = var.eip_config.create_eip ? 0 : length(var.eip_config.existing_allocation_ids)
-  network_interface_id = aws_network_interface.slo_nics[count.index].id
-  allocation_id        = var.eip_config.existing_allocation_ids[count.index]
-}
 
 ##############################################################################################################################
-# BLOCK 7 # Create the Security Group for (SLO) if user wants new security group needs to be created
+# BLOCK 5 # Create the Security Group for (SLO) if user wants new security group needs to be created
 ##############################################################################################################################
 # Create SLO Security Group (always needed)
 resource "aws_security_group" "slo_sg" {
@@ -189,7 +164,7 @@ resource "aws_security_group" "slo_sg" {
 }
 
 ##############################################################################################################################
-# BLOCK 8 # Create the Security Group for (SLI) if user wants new security group needs to be created
+# BLOCK 6 # Create the Security Group for (SLI) if user wants new security group needs to be created
 ##############################################################################################################################
 # Create SLI Security Group (only if num_nics == 2 and create_sli_sg is true)
 resource "aws_security_group" "sli_sg" {

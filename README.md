@@ -7,6 +7,7 @@ This is a **unified and flexible** configuration. This module allows you to sele
 This single codebase can handle:
 * **"Cluster" Model**: A standard 1-node or 3-node Cluster site. 
 * **"vSite" Model**: Deploys 1, 2, or 3 independent nodes that are grouped into a single Virtual Site. This is the vsite based HA model.
+
 Refer : https://community.f5.com/kb/technicalarticles/f5-distributed-cloud-%E2%80%93-ce-high-availability-options-a-comparative-exploration/330189
 * **Public IP**: Can create new Elastic IPs, use existing EIPs, or assign no public IP at all.
 * **NICs**: Supports both single-NIC (SLO only) and dual-NIC (SLO + SLI) deployments.

@@ -103,14 +103,9 @@ The `public_ip_mode` variable controls how public IPs are (or are not) assigned 
     cd <your-repo-name>
     ```
 
-2.  **Create your Variables File**
-    Create your own variable definitions using vs code.
-    ```bash
-    code terraform.tfvars
-    ```
 
-3.  **Edit `terraform.tfvars`**
-    This is the most important step. Fill in all the required values.
+2.  **Edit `terraform.tfvars`**
+    This is the most important step. Fill in all the required values. If you want you can save the file from this repo, copy to a new file and use that as a template.
 
     * **XC Credentials:** `api_p12_file`, `api_url`
     * **Deployment Model:** `deployment_model`, `cluster_name`, `num_nodes`, `num_nics`
@@ -121,18 +116,18 @@ The `public_ip_mode` variable controls how public IPs are (or are not) assigned 
 
     **Note:** The number of items in `az_names` and `slo_subnet_ids` (and `sli_subnet_ids` if used) **must** match your `num_nodes` value.
 
-4.  **Initialize Terraform**
+3.  **Initialize Terraform**
     ```bash
     terraform init
     ```
 
-5.  **Plan the Deployment**
+4.  **Plan the Deployment**
     Review the changes Terraform will make.
     ```bash
     terraform plan
     ```
 
-6.  **Apply the Configuration**
+5.  **Apply the Configuration**
     Type `yes` to approve the deployment.
     ```bash
     terraform apply
@@ -146,3 +141,30 @@ To tear down all resources created by this project, run the destroy command.
 
 ```bash
 terraform destroy
+```
+## Troubleshooting & FAQ
+
+**Q: `terraform plan` fails with a "Invalid value" error from a `check` block.**
+* **A:** This is by design. We use `check` blocks to validate your variable combinations *before* creating resources. Read the error message carefully. It will tell you exactly what is wrong.
+    * **Example 1:** `Invalid EIP configuration: ... 'existing_eip_allocation_ids' must contain exactly 3 ID(s).`
+        * **Fix:** You set `num_nodes = 3` and `public_ip_mode = "USE_EXISTING_EIP"`, but your `existing_eip_allocation_ids` list does not contain 3 items. Add the correct number of EIP IDs.
+    * **Example 2:** `Invalid node count: For 'cluster' model, num_nodes must be 1 or 3.`
+        * **Fix:** You set `deployment_model = "cluster"` and `num_nodes = 2`. This is an invalid combination. Change `num_nodes` to `1` or `3`.
+
+**Q: `terraform apply` fails with an error about `element()` or `count.index`.**
+* **A:** This almost always means your lists in `terraform.tfvars` do not have the same number of items as `num_nodes`.
+* **Fix:** Ensure that the number of items in `az_names`, `slo_subnet_ids`, and (if used) `sli_subnet_ids` *exactly* matches the value of `num_nodes`.
+
+**Q: My EC2 instances were created, but the site never comes "Online" in the F5 XC Console.**
+* **A:** This means the CE node cannot communicate with the F5 XC global network to register. This is an **egress connectivity problem**.
+* **Fix:**
+    1.  **Check your `public_ip_mode`:**
+        * If `"CREATE_EIP"` or `"USE_EXISTING_EIP"`: Ensure your **SLO Security Group** (`security_group_config`) allows outbound (egress) traffic on TCP port 443. If you used `create_slo_sg = true`, this is done for you. If you used an existing SG, you must add this rule.
+        * If `"NONE"`: This is the most common cause. Your **private subnet** (where the SLO NIC lives) **must** have a route table entry that directs internet-bound traffic (e.g., `0.0.0.0/0`) to an **AWS NAT Gateway**. Without this, the node has no way to call home.
+    2.  **Test Connectivity:** SSH into the EC2 instance using your `key_pair`. Once inside, run `curl -v https://google.com`. If this fails or times out, your AWS networking (Route Tables, Security Groups, or NAT Gateway) is not configured correctly for egress.
+
+**Q: `terraform plan` fails with an "Invalid cluster_name" error.**
+* **A:** Your `cluster_name` does not meet the DNS-1035 label standard.
+* **Fix:** The name must be all lowercase, can contain numbers and hyphens (`-`), must start with a letter, and must end with a letter or number.
+    * **Good:** `my-f5-site-1`
+    * **Bad:** `My-Site`, `1-site-f5`, `my-site-`

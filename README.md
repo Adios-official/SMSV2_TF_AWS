@@ -211,8 +211,14 @@ If you only need the list of public EIPs that were allocated, you can run:
 ```bash
 terraform output allocated_public_ips_to_SLO
 ```
-
-
+Smaple Output
+```bash
+allocated_public_ips_to_SLO = [
+  "54.1.2.3",
+  "54.4.5.6",
+  "54.7.8.9",
+]
+```
 ## Troubleshooting & FAQ
 
 **Q: `terraform plan` fails with a "Invalid value" error from a `check` block.**

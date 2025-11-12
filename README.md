@@ -162,6 +162,48 @@ This will display a structured object containing key information, such as:
 * The F5 XC Virtual Site Name (if created)
 * A summary of your chosen inputs (like `deployment_model`, `node_count`, etc.)
 
+Sample Output
+```bash
+deployment_summary = {
+  "aws_instance_azs" = [
+    "us-east-1a",
+    "us-east-1b",
+    "us-east-1c",
+  ]
+  "aws_instance_ids" = [
+    "i-0abcdef123456789a",
+    "i-0bcdefg23456789a1",
+    "i-0cdefgh3456789a12",
+  ]
+  "aws_region" = "us-east-1"
+  "cluster_name" = "my-aws-site"
+  "created_security_groups" = {
+    "sli" = null
+    "slo" = "sg-0123456789abcdef0"
+  }
+  "deployment_model" = "vsite"
+  "f5_xc_site_names" = [
+    "my-aws-site-1",
+    "my-aws-site-2",
+    "my-aws-site-3",
+  ]
+  "f5_xc_virtual_site_name" = "my-aws-site-vsite"
+  "nic_count" = 1
+  "node_count" = 3
+  "private_ips" = [
+    "10.0.1.50",
+    "10.0.2.100",
+    "10.0.3.150",
+  ]
+  "public_ip_mode" = "CREATE_EIP"
+  "public_ips" = [
+    "54.1.2.3",
+    "54.4.5.6",
+    "54.7.8.9",
+  ]
+}
+```
+
 ### 2. Public IPs Only
 
 If you only need the list of public EIPs that were allocated, you can run:
@@ -169,6 +211,7 @@ If you only need the list of public EIPs that were allocated, you can run:
 ```bash
 terraform output allocated_public_ips_to_SLO
 ```
+
 
 ## Troubleshooting & FAQ
 

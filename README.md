@@ -21,6 +21,7 @@ Refer : https://community.f5.com/kb/technicalarticles/f5-distributed-cloud-%E2%8
 * [File Structure](#file-structure)
 * [How to Deploy](#how-to-deploy)
 * [How to Destroy](#how-to-destroy)
+* [Deployment Outputs](#deployment-outputs)
 * [Troubleshooting & FAQ](#troubleshooting--faq)
 
 ---
@@ -142,6 +143,33 @@ To tear down all resources created by this project, run the destroy command.
 ```bash
 terraform destroy
 ```
+## Deployment Outputs
+
+After a successful `terraform apply`, this module provides structured outputs for you to easily see what was created.
+
+### 1. Deployment Summary
+
+To see a complete summary of all the resources you deployed, run:
+
+```bash
+terraform output deployment_summary
+```
+This will display a structured object containing key information, such as:
+* AWS Instance IDs and Availability Zones
+* Public and Private IP addresses
+* Created Security Group IDs (if any)
+* F5 XC Site Names
+* The F5 XC Virtual Site Name (if created)
+* A summary of your chosen inputs (like `deployment_model`, `node_count`, etc.)
+
+### 2. Public IPs Only
+
+If you only need the list of public EIPs that were allocated, you can run:
+
+```bash
+terraform output allocated_public_ips_to_SLO
+```
+
 ## Troubleshooting & FAQ
 
 **Q: `terraform plan` fails with a "Invalid value" error from a `check` block.**

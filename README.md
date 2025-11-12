@@ -33,19 +33,18 @@ You control the entire deployment architecture using the variables in `terraform
 
 The `deployment_model` variable is the most important choice. It determines the F5 XC site topology.
 
-* **`"cluster"`: (Standard HA Model)**
+* **`"cluster"`: (Standard Cluster Model)**
     * Creates **one** `volterra_securemesh_site_v2` resource in F5 XC.
-    * If `num_nodes = 1`, HA is disabled.
-    * If `num_nodes = 3`, HA is enabled for that single site.
+    * If `num_nodes = 1`, it will be a single node cluster
+    * If `num_nodes = 3`, it will be a 3 node cluster
     * All nodes (1 or 3) use a single, shared registration token.
-    * **Use this model** for standard single-node or 3-node high-availability (HA) sites.
+    * **Use this model** for standard single-node or 3-node Cluster sites.
 
 * **`"vsite"`: (Virtual Site Model)**
     * Creates **one** `volterra_securemesh_site_v2` resource *per node*. (e.g., `num_nodes = 2` creates 2 separate site objects).
-    * HA is **always disabled** for each of these individual sites.
     * Creates a `volterra_virtual_site` resource that groups all the individual sites together using a shared label.
     * Each node gets its own unique registration token.
-    * **Use this model** to deploy multiple, independent nodes (that may be in different locations) but manage them as a single logical group in F5 XC.
+    * **Use this model** to deploy multiple, independent nodes but manage them as a single logical group in F5 XC as a Virtual Site.
 
 
 

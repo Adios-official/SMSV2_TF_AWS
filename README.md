@@ -1,102 +1,148 @@
-# Multi-Deployment Customer Edge (CE) Solutions on AWS - Brown Field Deployments
+# F5 XC SMSV2 Customer Edge (CE) for AWS
 
-This repository contains multiple Terraform configurations to deploy **Customer Edge (CE)** instances in AWS, each designed to cater to different use cases. The configurations are organized into three distinct folders based on the deployment method, which are as follows:
+🚀 This Terraform project deploys F5 Distributed Cloud (XC) SMSV2 (Secure Mesh Site V2) Customer Edge (CE) nodes on AWS.
 
-- **CE with Custom Proxy + NAT**
-- **CE with Public SLO IP**
-- **CE with Manual XC Objects (Old Method)**
+This is a **unified and flexible** configuration. This module allows you to select your desired architecture by changing variables in the `terraform.tfvars` file.
 
-Each folder (except for CE with Manual XC Objects (Old Method)) contains a specific Terraform configuration that deploys a Single-node CE or High Availability (HA) 3-Node CE with Single NIC or dual NIC setups in AWS, with varying requirements for network configuration and proxy setups.
+This single codebase can handle:
+* **"Cluster" Model**: A standard 1-node or 3-node Cluster site. 
+* **"vSite" Model**: Deploys 1, 2, or 3 independent nodes that are grouped into a single Virtual Site. This is the vsite based HA model.
+Refer : https://community.f5.com/kb/technicalarticles/f5-distributed-cloud-%E2%80%93-ce-high-availability-options-a-comparative-exploration/330189
+* **Public IP**: Can create new Elastic IPs, use existing EIPs, or assign no public IP at all.
+* **NICs**: Supports both single-NIC (SLO only) and dual-NIC (SLO + SLI) deployments.
 
-## Folder Structure
+## Table of Contents
+* [Core Configuration Concepts](#core-configuration-concepts)
+  * [Deployment Model: Cluster vs. vSite](#1-deployment-model-cluster-vs-vsite)
+  * [Networking: Public IP vs. NAT Gateway](#2-networking-public-ip-vs-nat-gateway)
+  * [Node & NIC Count](#3-node--nic-count)
+* [Prerequisites](#prerequisites)
+* [File Structure](#file-structure)
+* [How to Deploy](#how-to-deploy)
+* [How to Destroy](#how-to-destroy)
+* [Troubleshooting & FAQ](#troubleshooting--faq)
 
-```plaintext
-.
-├── ce-with-custom-proxy-nat/
-│   ├── main.tf
-│   ├── provider.tf
-│   ├── terraform.tfvars
-│   ├── variables.tf
-│   ├── README.md
-│   └── ...
-├── ce-with-public-slo-ip/
-│   ├── main.tf
-│   ├── outputs.tf
-│   ├── provider.tf
-│   ├── terraform.tfvars
-│   ├── variables.tf
-│   ├── README.md
-│   └── ...
-└── ce-with-manual-xc-objects/
-    ├── main.tf
-    ├── provider.tf
-    ├── terraform.tfvars
-    ├── variables.tf
-    ├── README.md
-    └── ...
-```
+---
 
-## What Each Folder Contains
+## Core Configuration Concepts
 
-### 1. **`ce-with-custom-proxy-nat/`**
-This folder contains the Terraform configuration for deploying **Customer Edge (CE)** with custom proxy settings and NAT functionality. The instances in this setup are configured with network interfaces and access through a proxy server.
+You control the entire deployment architecture using the variables in `terraform.tfvars`.
 
-- **Use case**: Choose this configuration if your infrastructure requires custom proxy configurations for HTTP traffic and NAT for outbound traffic.
-- **Key Features**:
-  - Custom proxy settings available in `terraform.tfvars`.
-  - Assumes customer-side NAT configuration to route outbound traffic through an HTTP proxy.
+### 1. Deployment Model: Cluster vs. vSite
 
-### 2. **`ce-with-public-slo-ip/`**
-This folder contains the Terraform configuration for deploying **Customer Edge (CE)** with public IP addresses assigned to the **SLO network interfaces**. The IPs are managed either through new static IPs (Elastic IPs) or EIP Allocation IDs provided.
+The `deployment_model` variable is the most important choice. It determines the F5 XC site topology.
 
-- **Use case**: Choose this configuration if you need public IPs directly assigned to the SLO network interfaces for external communication.
-- **Key Features**:
-  - Public IP assignment to SLO interfaces, either dynamically (new IPs) or statically (existing IPs).
-  - Suitable for deployments requiring internet-facing interfaces with direct IP exposure (no NAT).
+* **`"cluster"`: (Standard HA Model)**
+    * Creates **one** `volterra_securemesh_site_v2` resource in F5 XC.
+    * If `num_nodes = 1`, HA is disabled.
+    * If `num_nodes = 3`, HA is enabled for that single site.
+    * All nodes (1 or 3) use a single, shared registration token.
+    * **Use this model** for standard single-node or 3-node high-availability (HA) sites.
 
-### 3. **`ce-with-manual-xc-objects/` (Old Method)**
-This folder contains the Terraform configuration for the **Customer Edge (CE)** with **manual XC objects** configuration. This method involves creating XC objects and tokens manually and managing them outside the Terraform configuration.
+* **`"vsite"`: (Virtual Site Model)**
+    * Creates **one** `volterra_securemesh_site_v2` resource *per node*. (e.g., `num_nodes = 2` creates 2 separate site objects).
+    * HA is **always disabled** for each of these individual sites.
+    * Creates a `volterra_virtual_site` resource that groups all the individual sites together using a shared label.
+    * Each node gets its own unique registration token.
+    * **Use this model** to deploy multiple, independent nodes (that may be in different locations) but manage them as a single logical group in F5 XC.
 
-- **Use case**: Choose this configuration if you prefer or need to manage XC objects and tokens manually.
-- **Key Features**:
-  - Manual token and XC object management.
-  - Suitable for legacy deployments that rely on manually configured XC objects.
 
-## How to Choose the Right Configuration
 
-When selecting the configuration to use, consider your environment and specific requirements:
+### 2. Networking: Public IP vs. NAT Gateway
 
-- **Use `ce-with-custom-proxy-nat/`**:
-  - If you have a network proxy in place and need NAT functionality.
-  - Ideal for environments with strict security or internal routing policies that require proxy servers.
+The `public_ip_mode` variable controls how public IPs are (or are not) assigned to the SLO (eth0) interface.
 
-- **Use `ce-with-public-slo-ip/`**:
-  - If you need public IP addresses for your SLO interfaces, either new or pre-existing.
-  - Suitable for deployments requiring internet-facing interfaces with direct IP exposure. ( NO NAT )
+* **`"CREATE_EIP"`**: **(Default)**
+    * Terraform will create a new AWS Elastic IP (EIP) for each node and attach it.
+    * Use this for simple "greenfield" deployments where you want the nodes to be reachable from the internet (e.g., for Site-to-Site VPN).
 
-- **Use `ce-with-manual-xc-objects/` (Old Method)**:
-  - If you prefer to manually manage XC objects and tokens.
-  - This configuration is an older setup created before the SMSV2 Volterra resource was introduced. It can be used if you wish to automate cloud provisioning while sticking to manual XC object management.
+* **`"USE_EXISTING_EIP"`**:
+    * Terraform will use a list of EIP Allocation IDs you provide in `existing_eip_allocation_ids`. The list count must match `num_nodes`.
+    * Use this if you have already reserved specific EIPs for this purpose.
 
-## Generic Structure of Each Folder
+* **`"NONE"`**: **(NAT / Proxy Model)**
+    * No public IP will be assigned.
+    * This is the correct choice for "brownfield" deployments where nodes are in a **private subnet** and egress traffic is handled by an existing **AWS NAT Gateway** or an HTTP proxy.
+    * **If you select `NONE`, you must ensure your private subnet's route table has a route to the internet (e.g., `0.0.0.0/0` via a NAT Gateway) so the node can register with F5 XC.**
 
-Each folder follows a consistent structure to ensure ease of use and maintainability. The main files in each folder are:
+### 3. Node & NIC Count
 
-- **`main.tf`**: Contains the main Terraform configuration for resources such as EC2 instances, network interfaces, and site tokens.
-- **`outputs.tf`**: Defines the output values, such as allocated public IPs, to be used for validation or further configuration.
-- **`provider.tf`**: Specifies the providers for AWS and Volterra. This file is essential for connecting to the respective platforms.
-- **`terraform.tfvars`**: Contains the user-specific values to customize the Terraform configuration, such as project ID, region, network settings, etc.
-- **`variables.tf`**: Defines the input variables, ensuring flexibility in how the configuration is customized and applied.
-- **`README.md`**: Describes the folder's purpose and gives deployment instructions.
+* `num_nodes`: The number of EC2 instances to deploy.
+    * If `deployment_model = "cluster"`, must be `1` or `3`.
+    * If `deployment_model = "vsite"`, can be `1`, `2`, or `3`.
+* `num_nics`: The number of network interfaces per node.
+    * `1`: Deploys only an SLO (eth0) interface.
+    * `2`: Deploys both an SLO (eth0) and an SLI (eth1) interface.
 
-## Deployment Guide
+---
 
-Each folder includes a `README.md` file with specific instructions on how to deploy the infrastructure:
+## Prerequisites
 
-- Refer to the individual folder `README.md` files for more detailed steps and explanations based on the deployment method you choose.
+1.  **Terraform** (v1.3.0 or newer).
+2.  **AWS Account** with credentials configured for Terraform (e.g., via AWS CLI `aws configure`).
+3.  **F5 Distributed Cloud Account** and an **API Credential (`.p12` file)**.
 
-## Conclusion
+---
 
-This repository offers flexible Terraform configurations to deploy high-availability Customer Edge (CE) clusters in AWS, each designed for specific use cases such as proxy setups, public IP assignments, and manual XC object management. Choose the configuration that best fits your environment and deploy your infrastructure with ease.
+## File Structure
 
-If you encounter any issues or need further assistance, feel free to consult the documentation or reach out to the support team.
+* `main.tf`: Contains the primary logic for creating all AWS (EC2, NICs, EIPs, SGs) and F5 XC (site, token, label, vsite) resources.
+* `variables.tf`: Defines all input variables, including their types, descriptions, and validation rules.
+* `provider.tf`: Declares the `aws` and `volterra` (F5 XC) providers.
+* `terraform.tfvars.example`: A template for you to copy and fill in with your specific values. (**Do not** commit your real `terraform.tfvars` file.)
+* `outputs.tf`: Defines outputs, such as the public IPs of the created nodes.
+* `README.md`: This file.
+
+---
+
+## How to Deploy
+
+1.  **Clone this Repository**
+    ```bash
+    git clone <your-repo-url>
+    cd <your-repo-name>
+    ```
+
+2.  **Create your Variables File**
+    Rename the example file to create your own variable definitions.
+    ```bash
+    cp terraform.tfvars.example terraform.tfvars
+    ```
+
+3.  **Edit `terraform.tfvars`**
+    This is the most important step. Fill in all the required values.
+
+    * **XC Credentials:** `api_p12_file`, `api_url`
+    * **Deployment Model:** `deployment_model`, `cluster_name`, `num_nodes`, `num_nics`
+    * **AWS Compute:** `region`, `ami`, `instance_type`, `key_pair`
+    * **AWS Networking:** `vpc_id`, `az_names`, `slo_subnet_ids`, `sli_subnet_ids` (if `num_nics = 2`)
+    * **IP Configuration:** `public_ip_mode`, `existing_eip_allocation_ids` (if needed)
+    * **Security Groups:** `security_group_config`
+
+    **Note:** The number of items in `az_names` and `slo_subnet_ids` (and `sli_subnet_ids` if used) **must** match your `num_nodes` value.
+
+4.  **Initialize Terraform**
+    ```bash
+    terraform init
+    ```
+
+5.  **Plan the Deployment**
+    Review the changes Terraform will make.
+    ```bash
+    terraform plan
+    ```
+
+6.  **Apply the Configuration**
+    Type `yes` to approve the deployment.
+    ```bash
+    terraform apply
+    ```
+
+---
+
+## How to Destroy
+
+To tear down all resources created by this project, run the destroy command.
+
+```bash
+terraform destroy

@@ -89,7 +89,7 @@ The `public_ip_mode` variable controls how public IPs are (or are not) assigned 
 * `main.tf`: Contains the primary logic for creating all AWS (EC2, NICs, EIPs, SGs) and F5 XC (site, token, label, vsite) resources.
 * `variables.tf`: Defines all input variables, including their types, descriptions, and validation rules.
 * `provider.tf`: Declares the `aws` and `volterra` (F5 XC) providers.
-* `terraform.tfvars.example`: A template for you to copy and fill in with your specific values. (**Do not** commit your real `terraform.tfvars` file.)
+* `terraform.tfvars`: A template for you to copy and fill in with your specific values. 
 * `outputs.tf`: Defines outputs, such as the public IPs of the created nodes.
 * `README.md`: This file.
 
@@ -104,9 +104,9 @@ The `public_ip_mode` variable controls how public IPs are (or are not) assigned 
     ```
 
 2.  **Create your Variables File**
-    Rename the example file to create your own variable definitions.
+    Create your own variable definitions using vs code.
     ```bash
-    cp terraform.tfvars.example terraform.tfvars
+    code terraform.tfvars
     ```
 
 3.  **Edit `terraform.tfvars`**

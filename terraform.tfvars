@@ -78,8 +78,8 @@ key_pair = "my-aws-keypair"
 
 # Root disk configuration for each node
 root_block_device = {
-  volume_size = 80    # Disk size in GB (min 120) - NOTE: Check docs for your instance type
-  volume_type = "gp2" # EBS volume type
+  volume_size = 120    # Disk size in GB (min 120) - NOTE: Check docs for your instance type
+  volume_type = "gp3" # EBS volume type
   encrypted   = false # (Optional) Enable encryption
 }
 

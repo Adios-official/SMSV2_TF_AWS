@@ -1,33 +1,9 @@
 ################################################################################
-# 1. ORIGINAL OUTPUT (FOR PUBLIC IPS)
+# OUTPUTS
 ################################################################################
-
-output "allocated_public_ips_to_SLO" {
-  description = "List of public IPs allocated to the instances. Will be empty if public_ip_mode is 'NONE'."
-  
-  # This value expression includes the 'tolist()' fix to clean up the terminal display
-  value = var.public_ip_mode == "CREATE_EIP" ? tolist([for eip in aws_eip.example : eip.public_ip]) : (
-            var.public_ip_mode == "USE_EXISTING_EIP" ? tolist([for alloc_id in var.existing_eip_allocation_ids : data.aws_eip.lookup[alloc_id].public_ip]) : []
-          )
-}
-
-# Data resource to fetch public IPs for existing allocation IDs
-data "aws_eip" "lookup" {
-  # This now only runs if the mode is "USE_EXISTING_EIP"
-  for_each = var.public_ip_mode == "USE_EXISTING_EIP" ? toset(var.existing_eip_allocation_ids) : []
-
-  # Look up the EIP by its allocation_id, which is passed to the 'id' argument
-  id = each.value
-}
-
-################################################################################
-# 2. NEW DEPLOYMENT SUMMARY OUTPUT
-################################################################################
-
 output "deployment_summary" {
   description = "A structured summary of all deployed resources and their key information."
   
-  # Display logic
   value = {
     # 1. Summary of inputs
     deployment_model = var.deployment_model
@@ -42,10 +18,17 @@ output "deployment_summary" {
     aws_instance_azs = [for instance in aws_instance.ec2_instance : instance.availability_zone]
 
     # 3. AWS Networking outputs
-    public_ips = var.public_ip_mode == "CREATE_EIP" ? tolist([for eip in aws_eip.example : eip.public_ip]) : (
-                   var.public_ip_mode == "USE_EXISTING_EIP" ? tolist([for alloc_id in var.existing_eip_allocation_ids : data.aws_eip.lookup[alloc_id].public_ip]) : []
-                 )
-    private_ips = [for nic in aws_network_interface.slo_nics : nic.private_ip]
+    # Public IPs (SLO)
+    public_ips_slo = var.public_ip_mode == "CREATE_EIP" ? tolist([for eip in aws_eip.example : eip.public_ip]) : (
+                       var.public_ip_mode == "USE_EXISTING_EIP" ? tolist([for alloc_id in var.existing_eip_allocation_ids : data.aws_eip.lookup[alloc_id].public_ip]) : []
+                     )
+    
+    # Private IPs (SLO)
+    private_ips_slo = [for nic in aws_network_interface.slo_nics : nic.private_ip]
+    
+    # Private IPs (SLI - only included if nic_count is 2)
+    private_ips_sli = var.num_nics == 2 ? [for nic in aws_network_interface.sli_nics : nic.private_ip] : []
+    
     created_security_groups = {
       slo = try(aws_security_group.slo_sg[0].id, null)
       sli = try(aws_security_group.sli_sg[0].id, null)
@@ -57,4 +40,14 @@ output "deployment_summary" {
       var.deployment_model == "vsite" ? try(volterra_virtual_site.smsv2-vsite[0].name, null) : "N/A (Cluster Model)"
     )
   }
+}
+
+# Data resource to fetch public IPs for existing allocation IDs
+# NOTE: This data source must remain in the file as it's required for the
+# public_ips_slo calculation above when public_ip_mode is set to "USE_EXISTING_EIP".
+data "aws_eip" "lookup" {
+  for_each = var.public_ip_mode == "USE_EXISTING_EIP" ? toset(var.existing_eip_allocation_ids) : []
+
+  # Look up the EIP by its allocation_id, which is passed to the 'id' argument
+  id = each.value
 }

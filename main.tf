@@ -201,8 +201,63 @@ resource "volterra_securemesh_site_v2" "smsv2-site-object" {
     geo_proximity = true
   }
 
-  aws {
-    not_managed {}
+aws {
+    not_managed {
+      dynamic "node_list" {
+        # Outer loop: Iterates over all nodes based on deployment model
+        for_each = var.deployment_model == "cluster" ? range(var.num_nodes) : [count.index]
+
+        content {
+          # Node Identifier
+          hostname = "ip-${replace(aws_network_interface.slo_nics[node_list.value].private_ip, ".", "-")}"
+          type     = "Control"
+#-------------------------------------------------------------------------------
+# ❗ IMPORTANT NOTE ON F5 XC AWS INTERFACE MAPPING:
+#
+# This explains how the Linux 'ens' names in your XC JSON or in the lines below correlate to AWS ENIs.
+#
+# "ens5": **Site Local Outside (SLO)**
+#    - AWS Device Index: 0 (Primary)
+#    - JSON Network Option: "site_local_network"
+#    - Role: Management, Public Connectivity (WAN)
+#
+# "ens6": **Site Local Inside (SLI)**
+#    - AWS Device Index: 1 (Secondary)
+#    - JSON Network Option: "site_local_inside_network"
+#    - Role: Workload Connectivity (LAN)
+#
+# KEY CONCEPT:
+# 'ens5' and 'ens6' are **Linux Kernel** names (Predictable Network Interface Names)
+# based on the PCI slot location on modern AWS Nitro instances, **not** AWS names.
+#-------------------------------------------------------------------------------
+          dynamic "interface_list" {
+            # Inner loop: Runs 1 (for ens5) or 2 (for ens5, ens6) times
+            for_each = range(var.num_nics)
+
+            content {
+              # --- Core Fields ---
+              name       = interface_list.value == 0 ? "ens5" : "ens6"
+              priority   = 0
+              mtu        = 0
+              dhcp_client = true
+
+              # --- Blocks for interface core config ---
+              ethernet_interface {
+                device = interface_list.value == 0 ? "ens5" : "ens6"
+              }
+
+              network_option {
+                # SLI (ens5, index 0): site_local_network is TRUE, site_local_inside_network is FALSE
+                site_local_network = interface_list.value == 0
+                
+                # SLI (ens6, index 1): site_local_network is FALSE, site_local_inside_network is TRUE
+                site_local_inside_network = interface_list.value == 1
+              }
+            }
+          }
+        }
+      }
+    }
   }
   
   lifecycle {

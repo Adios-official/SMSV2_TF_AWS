@@ -1,6 +1,6 @@
 # F5 XC SMSV2 Customer Edge (CE) for AWS
 
-🚀 This Terraform project deploys F5 Distributed Cloud (XC) SMSV2 (Secure Mesh Site V2) Customer Edge (CE) nodes on AWS.
+🚀 This Terraform project deploys F5 Distributed Cloud (XC) SMSV2 (Secure Mesh Site V2) Customer Edge (CE) nodes on AWS. This code is updated as per the latest release of Nov 16 2025
 
 This is a **unified and flexible** configuration. This module allows you to select your desired architecture by changing variables in the `terraform.tfvars` file.
 

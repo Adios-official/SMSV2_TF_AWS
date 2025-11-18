@@ -171,15 +171,15 @@ deployment_summary = {
     "us-east-1c",
   ]
   "aws_instance_ids" = [
-    "i-0abcdef123456789a",
-    "i-0bcdefg23456789a1",
-    "i-0cdefgh3456789a12",
+    "i-002f7b13f11905e3d",
+    "i-05165acf134c71212",
+    "i-0edc83f6c08811028",
   ]
   "aws_region" = "us-east-1"
   "cluster_name" = "my-aws-site"
   "created_security_groups" = {
-    "sli" = null
-    "slo" = "sg-0123456789abcdef0"
+    "sli" = "sg-04187191e68bb8eb5"
+    "slo" = "sg-02e8d161137c3ce2d"
   }
   "deployment_model" = "vsite"
   "f5_xc_site_names" = [
@@ -188,37 +188,27 @@ deployment_summary = {
     "my-aws-site-3",
   ]
   "f5_xc_virtual_site_name" = "my-aws-site-vsite"
-  "nic_count" = 1
+  "nic_count" = 2
   "node_count" = 3
-  "private_ips" = [
-    "10.0.1.50",
-    "10.0.2.100",
-    "10.0.3.150",
+  "private_ips_slo" = [
+    "10.0.1.79",
+    "10.0.2.139",
+    "10.0.3.54",
+  ]
+  "private_ips_sli" = [
+    "10.10.1.100",
+    "10.10.2.100",
+    "10.10.3.100",
   ]
   "public_ip_mode" = "CREATE_EIP"
-  "public_ips" = [
-    "54.1.2.3",
-    "54.4.5.6",
-    "54.7.8.9",
+  "public_ips_slo" = [
+    "3.76.148.184",
+    "18.184.148.129",
+    "18.156.96.150",
   ]
 }
 ```
 
-### 2. Public IPs Only
-
-If you only need the list of public EIPs that were allocated, you can run:
-
-```bash
-terraform output allocated_public_ips_to_SLO
-```
-Smaple Output
-```bash
-allocated_public_ips_to_SLO = [
-  "54.1.2.3",
-  "54.4.5.6",
-  "54.7.8.9",
-]
-```
 ## Troubleshooting & FAQ
 
 **Q: `terraform plan` fails with a "Invalid value" error from a `check` block.**

@@ -162,7 +162,7 @@ This will display a structured object containing key information, such as:
 * The F5 XC Virtual Site Name (if created)
 * A summary of your chosen inputs (like `deployment_model`, `node_count`, etc.)
 
-Sample Output
+Sample Output VSITE Model
 ```bash
 deployment_summary = {
   "aws_instance_azs" = [
@@ -209,6 +209,50 @@ deployment_summary = {
 }
 ```
 
+Sample Output CLUSTER Model
+```bash
+deployment_summary = {
+  "aws_instance_azs" = [
+    "eu-central-1a",
+    "eu-central-1b",
+    "eu-central-1c",
+  ]
+  "aws_instance_ids" = [
+    "i-03b7a581c7142c3ff",
+    "i-02b320a6edb3a1449",
+    "i-040628d2e5f24c061",
+  ]
+  "aws_region" = "eu-central-1"
+  "cluster_name" = "aws-ha-model-11"
+  "created_security_groups" = {
+    "sli" = "sg-095fe12d3ca44df13"
+    "slo" = "sg-09b568cf48d401ddc"
+  }
+  "deployment_model" = "cluster"
+  "f5_xc_site_names" = [
+    "aws-ha-model-11",
+  ]
+  "f5_xc_virtual_site_name" = "N/A (Cluster Model)"
+  "nic_count" = 2
+  "node_count" = 3
+  "private_ips_sli" = [
+    "10.0.11.72",
+    "10.0.12.212",
+    "10.0.13.47",
+  ]
+  "private_ips_slo" = [
+    "10.0.1.105",
+    "10.0.2.192",
+    "10.0.3.94",
+  ]
+  "public_ip_mode" = "CREATE_EIP"
+  "public_ips_slo" = [
+    "35.156.248.106",
+    "3.76.239.28",
+    "63.180.128.168",
+  ]
+}
+```
 ## Troubleshooting & FAQ
 
 **Q: `terraform plan` fails with a "Invalid value" error from a `check` block.**

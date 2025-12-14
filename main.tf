@@ -283,6 +283,10 @@ resource "volterra_token" "smsv2-token" {
   site_name = volterra_securemesh_site_v2.smsv2-site-object[count.index].name
 
   depends_on = [volterra_securemesh_site_v2.smsv2-site-object]
+
+   lifecycle {
+    ignore_changes = all 
+  }
 }
 
 

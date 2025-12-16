@@ -348,6 +348,7 @@ EOF
 
   lifecycle {
     create_before_destroy = true
+    ignore_changes = [user_data]
   }
 
   depends_on = [volterra_token.smsv2-token]

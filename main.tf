@@ -244,6 +244,7 @@ aws {
               # --- Blocks for interface core config ---
               ethernet_interface {
                 device = interface_list.value == 0 ? "ens5" : "ens6"
+                mac = ""
               }
 
               network_option {
